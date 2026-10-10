@@ -1,56 +1,31 @@
 package com.pepe.mirest.Models;
 
-public class Estudiante {
-    private int id;
-    private String nombre;
-    private String apellido;
-    private String password;
-    private int teñlefono;
-    public Estudiante(){
-        id =0;
-        nombre = "NA";
-        apellido = "NN";
-        password = "NN";
-        teñlefono = 0;
-    }
-    public Estudiante(int id, String nombre, String apellido, String password, int teñlefono) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.password = password;
-        this.teñlefono = teñlefono;
-    }
-    public int getId() {
-        return id;
-    }
-    public String getNombre() {
-        return nombre;
-    }
-    public String getApellido() {
-        return apellido;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public int getTelefono() {
-        return teñlefono;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public void setTelefono(int teñlefono) {
-        if(teñlefono < 0){
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "estudiante")
+public class Estudiante extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    public String nombre;
+    public String apellido;
+    public String password;
+    public Integer telefono;
+
+    // Panache no requiere getters/setters explícitos para los atributos públicos,
+    // pero si tu docente pide validación en el teléfono, la puedes incluir así:
+    public void setTelefono(Integer telefono) {
+        if (telefono != null && telefono < 0) {
             throw new IllegalArgumentException("El número de teléfono no puede ser negativo");
         }
-        this.teñlefono = teñlefono;
+        this.telefono = telefono;
     }
 }

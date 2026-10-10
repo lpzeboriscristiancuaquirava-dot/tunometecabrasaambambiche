@@ -1,44 +1,46 @@
 package com.pepe.mirest;
 
-
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import java.util.ArrayList;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
-import com.pepe.mirest.Models.*;
+import com.pepe.mirest.Models.Estudiante;
+
 @Path("/api/v1/estudiante")
-public class GreetingResource{
-    private List<Estudiante> estudiantes = new ArrayList<>();
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class GreetingResource {
 
-    public GreetingResource() {
-        estudiantes.add(new Estudiante(1, "Pepe", "Perales", "password123", 123456789));
-        estudiantes.add(new Estudiante(2, "María", "Gómez", "password456", 987654321));
-        estudiantes.add(new Estudiante(3, "Pedro", "López", "password789", 456789123));
-        estudiantes.add(new Estudiante(4, "Ana", "Martínez", "password321", 789123456));
-        estudiantes.add(new Estudiante(5, "Luis", "Rodríguez", "password654", 321654987));
-    }
-
+    // 1. Obtener TODOS los estudiantes desde MySQL
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public Response ObtenerEstudiantes() {
+        List<Estudiante> estudiantes = Estudiante.listAll();
         return Response.ok(estudiantes).build();
     }
+
+    // 2. Obtener UN estudiante por su ID desde MySQL
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response ObtenerEstudiantes(@QueryParam("id") String id) {
-        Estudiante estudianteBuscado = null;
-        for (Estudiante estudiante : estudiantes) {
-            if (String.valueOf(estudiante.getId()).equals(id)) {
-                estudianteBuscado = estudiante;
-                break;
-            }
+    @Path("/buscar")
+    public Response ObtenerEstudiantePorId(@QueryParam("id") Long id) {
+        Estudiante estudiante = Estudiante.findById(id);
+        if (estudiante == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Estudiante no encontrado").build();
         }
-        return Response.ok(estudianteBuscado).build();
+        return Response.ok(estudiante).build();
+    }
+
+    // 3. Crear UN estudiante nuevo en MySQL
+    @POST
+    @Transactional
+    public Response CrearEstudiante(Estudiante nuevoEstudiante) {
+        nuevoEstudiante.persist();
+        return Response.status(Response.Status.CREATED).entity(nuevoEstudiante).build();
     }
 }
